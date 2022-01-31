@@ -1,0 +1,361 @@
+#this script is written to generate Table S2.
+
+####Setting up a working directory.
+setwd("/working dir")
+
+####loading pre-processed dataset.
+data <- read.csv("RA.all.Age.Sys.Dia.Bmi.region.ratio1.csv", header=T, na.string="NA")
+young <- read.csv("RA.Young_50.Age.Sys.Dia.Bmi.region.ratio1.csv", header=T, na.string="NA")
+older <- read.csv("RA.Old_50.Age.Sys.Dia.Bmi.region.ratio1.csv", header=T, na.string="NA")
+
+
+####this function used for get mean and standard deviation 
+getMeanSTD <- function(x) {
+	return(paste(round(mean(x),2)," (",round(sd(x),2),")",sep=""))
+}
+
+####this function used for get count number
+getCount <- function(x) {
+	return(length(x))
+}
+
+####this function used for get count number and precentage
+getCountFraction <- function(x, y) {
+	results <- round(100*length(x)/length(y), 2)
+	return(paste(length(x)," (",results,"%)",sep=""))
+}
+
+
+###ANOVA
+
+getANOVA <- function (values, group) {
+	fit <- lm(values ~ group)
+	result <- anova(fit)
+	return(result[1,5])
+}
+
+###Chisq
+getChisq <- function(group1,group2,total1,total2) {
+	M <- as.table(rbind(c(group1,group2),
+						c(total1-group1,total2-group2))
+						)
+    Xsq <- chisq.test(M)
+    return(Xsq$p.value)
+}
+
+####separate male and female individuals.
+male <- data[data$gender == "male",]
+female <- data[data$gender == "female",]
+
+young_male <- young[young$gender == "male",]
+young_female <- young[young$gender == "female",]
+
+older_male <- older[older$gender == "male",]
+older_female <- older[older$gender == "female",]
+
+########Generate Table 1###############
+####Count
+
+tableS2 <- c(
+			getCount(female$age),
+			getCount(male$age),
+			NA,
+			getCount(young_female$age),
+			getCount(young_male$age),
+			NA,
+			getCount(older_female$age),
+			getCount(older_male$age),
+			NA
+			)
+				
+
+####Age
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getMeanSTD(female$age),
+					getMeanSTD(male$age),
+					getANOVA(data$age, data$gender),
+					getMeanSTD(young_female$age),
+					getMeanSTD(young_male$age),
+					getANOVA(young$age, young$gender),
+					getMeanSTD(older_female$age),
+					getMeanSTD(older_male$age),
+					getANOVA(older$age, older$gender)
+				)
+				)
+
+####BMI
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getMeanSTD(female$bmi),
+					getMeanSTD(male$bmi),
+					getANOVA(data$bmi, data$gender),
+					getMeanSTD(young_female$bmi),
+					getMeanSTD(young_male$bmi),
+					getANOVA(young$bmi, young$gender),
+					getMeanSTD(older_female$bmi),
+					getMeanSTD(older_male$bmi),
+					getANOVA(older$bmi, older$gender)
+				)
+				)
+
+####BMI Precentage
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getCountFraction(female[female$bmi>=27.5,]$bmi, 
+									female$bmi),
+					getCountFraction(male[male$bmi>=27.5,]$bmi, 
+									male$bmi),
+					getChisq(nrow(female[female$bmi>=27.5,]), 
+									nrow(male[male$bmi>=27.5,]), 
+									nrow(female), 
+									nrow(male)),
+					getCountFraction(young_female[young_female$bmi>=27.5,]$bmi, 
+									young_female$bmi),
+					getCountFraction(young_male[young_male$bmi>=27.5,]$bmi, 
+									young_male$bmi),
+					getChisq(nrow(young_female[young_female$bmi>=27.5,]), 
+									nrow(young_male[young_male$bmi>=27.5,]), 
+									nrow(young_female), 
+									nrow(young_male)),
+					getCountFraction(older_female[older_female$bmi>=27.5,]$bmi, 
+									older_female$bmi),
+					getCountFraction(older_male[older_male$bmi>=27.5,]$bmi, 
+									older_male$bmi),
+					getChisq(nrow(older_female[older_female$bmi>=27.5,]), 
+									nrow(older_male[older_male$bmi>=27.5,]), 
+									nrow(older_female), 
+									nrow(older_male))
+				)
+				)
+
+####Region Precentage
+#East China
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getCountFraction(female[female$region=="EastChina",]$bmi, 
+									female$bmi),
+					getCountFraction(male[male$region=="EastChina",]$bmi, 
+									male$bmi),
+					NA,
+					getCountFraction(young_female[young_female$region=="EastChina",]$bmi, 
+									young_female$bmi),
+					getCountFraction(young_male[young_male$region=="EastChina",]$bmi, 
+									young_male$bmi),
+					NA,
+					getCountFraction(older_female[older_female$region=="EastChina",]$bmi, 
+									older_female$bmi),
+					getCountFraction(older_male[older_male$region=="EastChina",]$bmi, 
+									older_male$bmi),
+					NA
+				)
+				)
+
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getCountFraction(female[female$region=="NorthChina",]$bmi, 
+									female$bmi),
+					getCountFraction(male[male$region=="NorthChina",]$bmi, 
+									male$bmi),
+					NA,
+					getCountFraction(young_female[young_female$region=="NorthChina",]$bmi, 
+									young_female$bmi),
+					getCountFraction(young_male[young_male$region=="NorthChina",]$bmi, 
+									young_male$bmi),
+					NA,
+					getCountFraction(older_female[older_female$region=="NorthChina",]$bmi, 
+									older_female$bmi),
+					getCountFraction(older_male[older_male$region=="NorthChina",]$bmi, 
+									older_male$bmi),
+					NA
+				)
+				)
+
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getCountFraction(female[female$region=="SouthChina",]$bmi, 
+									female$bmi),
+					getCountFraction(male[male$region=="SouthChina",]$bmi, 
+									male$bmi),
+					NA,
+					getCountFraction(young_female[young_female$region=="SouthChina",]$bmi, 
+									young_female$bmi),
+					getCountFraction(young_male[young_male$region=="SouthChina",]$bmi, 
+									young_male$bmi),
+					NA,
+					getCountFraction(older_female[older_female$region=="SouthChina",]$bmi, 
+									older_female$bmi),
+					getCountFraction(older_male[older_male$region=="SouthChina",]$bmi, 
+									older_male$bmi),
+					NA
+				)
+				)
+
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getCountFraction(female[female$region=="SouthWestChina",]$bmi, 
+									female$bmi),
+					getCountFraction(male[male$region=="SouthWestChina",]$bmi, 
+									male$bmi),
+					NA,
+					getCountFraction(young_female[young_female$region=="SouthWestChina",]$bmi, 
+									young_female$bmi),
+					getCountFraction(young_male[young_male$region=="SouthWestChina",]$bmi, 
+									young_male$bmi),
+					NA,
+					getCountFraction(older_female[older_female$region=="SouthWestChina",]$bmi, 
+									older_female$bmi),
+					getCountFraction(older_male[older_male$region=="SouthWestChina",]$bmi, 
+									older_male$bmi),
+					NA
+				)
+				)
+###############################
+
+####Systolic
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getMeanSTD(female$sys),
+					getMeanSTD(male$sys),
+					getANOVA(data$sys, data$gender),
+					getMeanSTD(young_female$sys),
+					getMeanSTD(young_male$sys),
+					getANOVA(young$bmi, young$gender),
+					getMeanSTD(older_female$sys),
+					getMeanSTD(older_male$sys),
+					getANOVA(older$bmi, older$gender)
+				 )
+				)
+
+####Diastolic 
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getMeanSTD(female$dia),
+					getMeanSTD(male$dia),
+					getANOVA(data$dia, data$gender),
+					getMeanSTD(young_female$dia),
+					getMeanSTD(young_male$dia),
+					getANOVA(young$sys, young$gender),
+					getMeanSTD(older_female$dia),
+					getMeanSTD(older_male$dia),
+					getANOVA(older$sys, older$gender)
+				 )
+				)
+
+###ICG Parameters
+
+#Cardiac Output
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getMeanSTD(female$co),
+					getMeanSTD(male$co),
+					getANOVA(data$co, data$gender),
+					getMeanSTD(young_female$co),
+					getMeanSTD(young_male$co),
+					getANOVA(young$co, young$gender),
+					getMeanSTD(older_female$co),
+					getMeanSTD(older_male$co),
+					getANOVA(older$co, older$gender)
+				 )
+				)
+
+#Cardiac Index
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getMeanSTD(female$ci),
+					getMeanSTD(male$ci),
+					getANOVA(data$ci, data$gender),
+					getMeanSTD(young_female$ci),
+					getMeanSTD(young_male$ci),
+					getANOVA(young$ci, young$gender),
+					getMeanSTD(older_female$ci),
+					getMeanSTD(older_male$ci),
+					getANOVA(older$ci, older$gender)
+				 )
+				)
+
+#SVR
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getMeanSTD(female$tpr),
+					getMeanSTD(male$tpr),
+					getANOVA(data$tpr, data$gender),
+					getMeanSTD(young_female$tpr),
+					getMeanSTD(young_male$tpr),
+					getANOVA(young$tpr, young$gender),
+					getMeanSTD(older_female$tpr),
+					getMeanSTD(older_male$tpr),
+					getANOVA(older$tpr, older$gender)
+				 )
+				)
+
+#SVRI
+tableS2 <- rbind(
+				tableS2,
+				c(
+					getMeanSTD(female$tpri),
+					getMeanSTD(male$tpri),
+					getANOVA(data$tpri, data$gender),
+					getMeanSTD(young_female$tpri),
+					getMeanSTD(young_male$tpri),
+					getANOVA(young$tpri, young$gender),
+					getMeanSTD(older_female$tpri),
+					getMeanSTD(older_male$tpri),
+					getANOVA(older$tpri, older$gender)
+				 )
+				)
+
+
+##chisq test for reion
+#all 
+M <- as.table(rbind(c(5965, 6273), 
+					c(3665, 3405),
+					c(2737, 2695),
+					c(3521, 3515)
+					)
+					)
+
+dimnames(M) <- list(gender = c("East", "North", "South", "SouthWest"),
+                    party = c("F","M"))
+
+chisq.test(M)
+
+#young age < 50 years old
+M <- as.table(rbind(c(1956, 1920), 
+					c(779, 846),
+					c(686, 695),
+					c(963, 923)
+					)
+					)
+
+dimnames(M) <- list(gender = c("East", "North", "South", "SouthWest"),
+                    party = c("F","M"))
+
+chisq.test(M)
+
+
+#older age >= 50 years old
+M <- as.table(rbind(c(4009, 4597), 
+					c(2886, 2269),
+					c(2051, 1869),
+					c(2558, 2769)
+					)
+					)
+
+dimnames(M) <- list(gender = c("East", "North", "South", "SouthWest"),
+                    party = c("F","M"))
+
+chisq.test(M)
+

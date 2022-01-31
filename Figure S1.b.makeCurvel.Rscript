@@ -1,0 +1,134 @@
+#this script is written to generate Figure S1.
+
+####Setting up a working directory.
+setwd("/working dir")
+
+cols = c("lightblue","blue","black")
+setEPS()
+
+
+####create Fig2
+postscript('FigureS1.eps', width=12, height=8)
+par(mfrow=c(2,2))
+########CO
+data <- read.csv("MaleCO.S1.csv",header=T)
+
+plot(data[,1],data[,2],type="n",xaxt="n",yaxt="n",main="",ylim=c(min(data[,3])-1,max(data[,5])+1),xlab="",ylab= "",col="red", cex=1.2)
+title("CO, Median", adj=0, cex=1.2)
+title(ylab=expression('CO (L/min'*')'), xlab="Age (years)", line= 2, cex.lab=1.2)
+abline(b=0,v=seq(0,100,by=5),col="lightgrey")
+tmp = seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,1))
+abline(b=0,h=tmp,col="lightgrey")
+
+axis(side=1,at=seq(20,80,5),lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=1,at=seq(20,80,1),mgp=c(0,0.5,0),labels=FALSE)
+axis(side=2,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,1)),lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=2,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/50,1)),mgp=c(0,0.5,0),labels=FALSE)
+axis(side=4,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,1)),tcl=0.4,lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=4,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/50,1)),tcl=0.4,mgp=c(0,0.5,0),labels=FALSE)
+
+lines(data[,1],data[,4],lwd=2,col="black")
+lines(data[,1],data[,3], lty = 2,lwd=1,col="black")
+lines(data[,1],data[,5], lty = 2,lwd=1,col="black")
+
+data <- read.csv("FemaleCO.S1.csv",header=T)
+
+lines(data[,1],data[,4],lwd=2,col="red")
+lines(data[,1],data[,3], lty = 2,lwd=1,col="red")
+lines(data[,1],data[,5], lty = 2,lwd=1,col="red")
+
+legend('topleft',legend=c("Men","Women"), fill=c("black","red"),bty="n")
+
+
+########CI
+data <- read.csv("MaleCI.S1.csv",header=T)
+
+plot(data[,1],data[,2],type="n",xaxt="n",yaxt="n",main="",ylim=c(min(data[,3])-1,max(data[,5])+1),xlab="",ylab= "",col="red", cex=1.2)
+title("CI, Median", adj=0, cex=1.2)
+title(ylab=expression('CI (L/min/m'^'2'*')'), xlab="Age (years)", line= 2, cex.lab=1.2)
+abline(b=0,v=seq(0,100,by=5),col="lightgrey")
+tmp = seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,1))
+abline(b=0,h=tmp,col="lightgrey")
+
+axis(side=1,at=seq(20,80,5),lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=1,at=seq(20,80,1),mgp=c(0,0.5,0),labels=FALSE)
+axis(side=2,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,1)),lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=2,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/50,1)),mgp=c(0,0.5,0),labels=FALSE)
+axis(side=4,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,1)),tcl=0.4,lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=4,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/50,1)),tcl=0.4,mgp=c(0,0.5,0),labels=FALSE)
+
+lines(data[,1],data[,4],lwd=2,col="black")
+lines(data[,1],data[,3],lty=2,lwd=1,col="black")
+lines(data[,1],data[,5],lty=2,lwd=1,col="black")
+
+data <- read.csv("FemaleCI.S1.csv",header=T)
+
+lines(data[,1],data[,4],lwd=2,col="red")
+lines(data[,1],data[,3],lty=2,lwd=1,col="red")
+lines(data[,1],data[,5],lty=2,lwd=1,col="red")
+
+legend('topleft',legend=c("Men","Women"), fill=c("black","red"),bty="n")
+
+########SVR
+
+data <- read.csv("MaleSVR.S1.csv",header=T)
+
+plot(data[,1],data[,2],type="n",xaxt="n",yaxt="n",main="",ylim=c(min(data[,3])-200,max(data[,5])+200),xlab="",ylab="",col="red", cex=1.2)
+title("SVR, Median", adj=0)
+title(ylab=expression('SVR (dynes*sec*cm'^'-5'*")"), xlab="Age (years)", line= 2, cex.lab=1.2)
+abline(b=0,v=seq(0,100,by=5),col="lightgrey")
+tmp = seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,2))
+abline(b=0,h=tmp,col="lightgrey")
+
+axis(side=1,at=seq(20,80,5),lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=1,at=seq(20,80,1),mgp=c(0,0.5,0),labels=FALSE)
+axis(side=2,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,0)),lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=2,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/50,0)),mgp=c(0,0.5,0),labels=FALSE)
+axis(side=4,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,0)),tcl=0.4,lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=4,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/50,0)),tcl=0.4,mgp=c(0,0.5,0),labels=FALSE)
+
+
+lines(data[,1],data[,4],lwd=2,col="black")
+lines(data[,1],data[,3],lty=2,lwd=1,col="black")
+lines(data[,1],data[,5],lty=2,lwd=1,col="black")
+
+data <- read.csv("FemaleSVR.S1.csv",header=T)
+
+lines(data[,1],data[,4],lwd=2,col="red")
+lines(data[,1],data[,3],lty=2,lwd=1,col="red")
+lines(data[,1],data[,5],lty=2,lwd=1,col="red")
+legend('topleft',legend=c("Men","Women"), fill=c("black","red"),bty="n")
+
+########SVRI
+data <- read.csv("MaleSVRI.S1.csv",header=T)
+
+plot(data[,1],data[,2],type="n",xaxt="n",yaxt="n",main="",ylim=c(min(data[,3])-200,max(data[,5])+200),xlab="",ylab="",col="red", cex=1.2)
+title("SVRI, Median", adj=0)
+title(ylab=expression('SVRI (dynes*sec*cm'^'-5'*'*m'^'2'*")"), xlab="Age (years)", line= 2, cex.lab=1.2)
+abline(b=0,v=seq(0,100,by=5),col="lightgrey")
+tmp = seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,2))
+abline(b=0,h=tmp,col="lightgrey")
+
+axis(side=1,at=seq(20,80,5),lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=1,at=seq(20,80,1),mgp=c(0,0.5,0),labels=FALSE)
+axis(side=2,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,0)),lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=2,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/50,0)),mgp=c(0,0.5,0),labels=FALSE)
+axis(side=4,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/10,0)),tcl=0.4,lwd.ticks=2,mgp=c(0,0.5,0))
+axis(side=4,at=seq(round(min(data[,2])),round(max(data[,6]))+0.4,round((max(data[,6])-min(data[,2]))/50,0)),tcl=0.4,mgp=c(0,0.5,0),labels=FALSE)
+
+
+lines(data[,1],data[,4],lwd=2,col="black")
+lines(data[,1],data[,3],lty=2,lwd=1,col="black")
+lines(data[,1],data[,5],lty=2,lwd=1,col="black")
+
+data <- read.csv("FemaleSVRI.S1.csv",header=T)
+
+lines(data[,1],data[,4],lwd=2,col="red")
+lines(data[,1],data[,3],lty=2,lwd=1,col="red")
+lines(data[,1],data[,5],lty=2,lwd=1,col="red")
+
+legend('topleft',legend=c("Men","Women"), fill=c("black","red"),bty="n")
+
+dev.off()
+
+

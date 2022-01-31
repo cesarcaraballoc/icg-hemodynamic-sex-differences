@@ -1,0 +1,59 @@
+#this script is written to generate Table S2 (propensity score matching) data.
+#library(twang)
+library(MatchIt)
+library(ggplot2)
+
+
+
+####Setting up a working directory.
+setwd("/working dir")
+
+####loading pre-processed dataset.
+data <- read.csv("demo.processed.data.csv", header=T, na.string="NA")
+
+####Filtering out individuals with elevated blood pressure.
+data <- data[data$sys>=130 | data$dia >= 80,]
+cat("There are ",nrow(data)," included in this study.\n")
+cat("Male: ",nrow(data[data$gender=="male",]),".\n")
+cat("Female: ",nrow(data[data$gender=="female",]),".\n")
+
+###################################
+
+male <- data[data$gender == "male",]
+female <- data[data$gender == "female",]
+
+
+data$treatment <- 1
+data[data$gender=="male",]$treatment <- 0
+
+old <- data[data$age>=50,]
+young <- data[data$age<50,]
+
+###matching aged sub-group
+m.out.old <- matchit(treatment ~  age + sys + dia + bmi + region, data=old, method="nearest", ratio=1)
+
+summary(m.out.old)
+
+m.data.old <- match.data(m.out.old)
+
+write.csv(m.data.old, file="RA.Old_50.Age.Sys.Dia.Bmi.region.ratio1.csv")
+
+###matching young sub-group
+m.out.young <- matchit(treatment ~ age + sys + dia + bmi + region, data=young, method="nearest", ratio=1)
+
+summary(m.out.young)
+
+m.data.young <- match.data(m.out.young)
+
+write.csv(m.data.young, file="RA.Young_50.Age.Sys.Dia.Bmi.region.ratio1.csv")
+
+###matching all individuals
+m.out <- matchit(treatment ~ age + sys + dia + bmi + region, data=data, method="nearest", ratio=1)
+
+summary(m.out)
+
+m.data <- match.data(m.out)
+
+write.csv(m.data, file="RA.all.Age.Sys.Dia.Bmi.region.ratio1.csv")
+
+

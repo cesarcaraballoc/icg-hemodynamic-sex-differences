@@ -1,0 +1,377 @@
+#this script is written to generate Table 2.
+
+####Setting up a working directory.
+setwd("/working dir")
+
+####loading pre-processed dataset.
+data <- read.csv("demo.processed.data.csv", header=T, na.string="NA")
+
+####Filtering out individuals with elevated blood pressure.
+data <- data[data$sys>=130 | data$dia >= 80,]
+cat("There are ",nrow(data)," included in this study.\n")
+cat("Male: ",nrow(data[data$gender=="male",]),".\n")
+cat("Female: ",nrow(data[data$gender=="female",]),".\n")
+
+
+####Set reference gender, male
+data$gender <- as.factor(data$gender)
+data <- within(data,gender <- relevel(gender,ref = "male"))
+
+####create young and aged sub-groups.
+young <- data[data$age<50,]
+older <- data[data$age>=50,]
+
+
+####Unadjusted Model 
+
+sink(file="table2.regression.unadjusted.csv",append=FALSE)
+
+cat("CO: \n")
+##run regression
+fitco <- lm(co ~ gender , data=data)
+summary_co <- summary(fitco)
+summary_co
+#95% confidence interval
+confint(fitco)
+
+cat("CI: \n")
+##run regression
+fitci <- lm(ci ~ gender , data=data)
+summary_ci <- summary(fitci)
+summary_ci
+#95% confidence interval
+confint(fitci)
+
+cat("SVR: \n")
+##run regression
+fittpr <- lm(tpr ~ gender , data=data)
+summary_tpr <- summary(fittpr)
+summary_tpr
+#95% confidence interval
+confint(fittpr)
+
+cat("SVRI: \n")
+##run regression
+fittpri <- lm(tpri ~ gender , data=data)
+summary_tpri <- summary(fittpri)
+summary_tpri
+#95% confidence interval
+confint(fittpri)
+
+sink()
+
+####adjusted Model 1 (adjust for age and region)
+
+sink(file="table2.regression.adjusted.age.region.csv",append=FALSE)
+
+cat("CO: \n")
+##run regression
+fitco <- lm(co ~ gender + age + region , data=data)
+summary_co <- summary(fitco)
+summary_co
+#95% confidence interval
+confint(fitco)
+
+cat("CI: \n")
+##run regression
+fitci <- lm(ci ~ gender + age + region , data=data)
+summary_ci <- summary(fitci)
+summary_ci
+#95% confidence interval
+confint(fitci)
+
+cat("SVR: \n")
+##run regression
+fittpr <- lm(tpr ~ gender + age + region , data=data)
+summary_tpr <- summary(fittpr)
+summary_tpr
+#95% confidence interval
+confint(fittpr)
+
+cat("SVRI: \n")
+##run regression
+fittpri <- lm(tpri ~ gender + age + region , data=data)
+summary_tpri <- summary(fittpri)
+summary_tpri
+#95% confidence interval
+confint(fittpri)
+
+
+sink()
+
+
+####adjusted Model 2 (adjust for age, region and bmi)
+
+sink(file="table2.regression.adjusted.age.region.bmi.csv",append=FALSE)
+
+cat("CO: \n")
+##run regression
+fitco <- lm(co ~ gender + age + region + bmi, data=data)
+summary_co <- summary(fitco)
+summary_co
+#95% confidence interval
+confint(fitco)
+
+cat("CI: \n")
+##run regression
+fitci <- lm(ci ~ gender + age + region + bmi, data=data)
+summary_ci <- summary(fitci)
+summary_ci
+#95% confidence interval
+confint(fitci)
+
+cat("SVR: \n")
+##run regression
+fittpr <- lm(tpr ~ gender + age + region + bmi, data=data)
+summary_tpr <- summary(fittpr)
+summary_tpr
+#95% confidence interval
+confint(fittpr)
+
+cat("SVRI: \n")
+##run regression
+fittpri <- lm(tpri ~ gender + age + region + bmi, data=data)
+summary_tpri <- summary(fittpri)
+summary_tpri
+#95% confidence interval
+confint(fittpri)
+
+
+sink()
+
+
+####Unadjusted Model for young sub-groups
+
+sink(file="table2.young.regression.unadjusted.csv",append=FALSE)
+
+cat("CO: \n")
+##run regression
+fitco <- lm(co ~ gender , data=young)
+summary_co <- summary(fitco)
+summary_co
+#95% confidence interval
+confint(fitco)
+
+cat("CI: \n")
+##run regression
+fitci <- lm(ci ~ gender , data=young)
+summary_ci <- summary(fitci)
+summary_ci
+#95% confidence interval
+confint(fitci)
+
+cat("SVR: \n")
+##run regression
+fittpr <- lm(tpr ~ gender , data=young)
+summary_tpr <- summary(fittpr)
+summary_tpr
+#95% confidence interval
+confint(fittpr)
+
+cat("SVRI: \n")
+##run regression
+fittpri <- lm(tpri ~ gender , data=young)
+summary_tpri <- summary(fittpri)
+summary_tpri
+#95% confidence interval
+confint(fittpri)
+
+sink()
+
+####adjusted Model 1 (adjust for age and region)
+
+sink(file="table2.young.regression.adjusted.age.region.csv",append=FALSE)
+
+cat("CO: \n")
+##run regression
+fitco <- lm(co ~ gender + age + region , data=young)
+summary_co <- summary(fitco)
+summary_co
+#95% confidence interval
+confint(fitco)
+
+cat("CI: \n")
+##run regression
+fitci <- lm(ci ~ gender + age + region , data=young)
+summary_ci <- summary(fitci)
+summary_ci
+#95% confidence interval
+confint(fitci)
+
+cat("SVR: \n")
+##run regression
+fittpr <- lm(tpr ~ gender + age + region , data=young)
+summary_tpr <- summary(fittpr)
+summary_tpr
+#95% confidence interval
+confint(fittpr)
+
+cat("SVRI: \n")
+##run regression
+fittpri <- lm(tpri ~ gender + age + region , data=young)
+summary_tpri <- summary(fittpri)
+summary_tpri
+#95% confidence interval
+confint(fittpri)
+
+
+sink()
+
+
+####adjusted Model 2 (adjust for age, region and bmi)
+
+sink(file="table2.young.regression.adjusted.age.region.bmi.csv",append=FALSE)
+
+cat("CO: \n")
+##run regression
+fitco <- lm(co ~ gender + age + region + bmi, data=young)
+summary_co <- summary(fitco)
+summary_co
+#95% confidence interval
+confint(fitco)
+
+cat("CI: \n")
+##run regression
+fitci <- lm(ci ~ gender + age + region + bmi, data=young)
+summary_ci <- summary(fitci)
+summary_ci
+#95% confidence interval
+confint(fitci)
+
+cat("SVR: \n")
+##run regression
+fittpr <- lm(tpr ~ gender + age + region + bmi, data=young)
+summary_tpr <- summary(fittpr)
+summary_tpr
+#95% confidence interval
+confint(fittpr)
+
+cat("SVRI: \n")
+##run regression
+fittpri <- lm(tpri ~ gender + age + region + bmi, data=young)
+summary_tpri <- summary(fittpri)
+summary_tpri
+#95% confidence interval
+confint(fittpri)
+
+
+sink()
+
+
+
+####Unadjusted Model for older sub-groups
+
+sink(file="table2.older.regression.unadjusted.csv",append=FALSE)
+
+cat("CO: \n")
+##run regression
+fitco <- lm(co ~ gender , data=older)
+summary_co <- summary(fitco)
+summary_co
+#95% confidence interval
+confint(fitco)
+
+cat("CI: \n")
+##run regression
+fitci <- lm(ci ~ gender , data=older)
+summary_ci <- summary(fitci)
+summary_ci
+#95% confidence interval
+confint(fitci)
+
+cat("SVR: \n")
+##run regression
+fittpr <- lm(tpr ~ gender , data=older)
+summary_tpr <- summary(fittpr)
+summary_tpr
+#95% confidence interval
+confint(fittpr)
+
+cat("SVRI: \n")
+##run regression
+fittpri <- lm(tpri ~ gender , data=older)
+summary_tpri <- summary(fittpri)
+summary_tpri
+#95% confidence interval
+confint(fittpri)
+
+sink()
+
+####adjusted Model 1 (adjust for age and region)
+
+sink(file="table2.older.regression.adjusted.age.region.csv",append=FALSE)
+
+cat("CO: \n")
+##run regression
+fitco <- lm(co ~ gender + age + region , data=older)
+summary_co <- summary(fitco)
+summary_co
+#95% confidence interval
+confint(fitco)
+
+cat("CI: \n")
+##run regression
+fitci <- lm(ci ~ gender + age + region , data=older)
+summary_ci <- summary(fitci)
+summary_ci
+#95% confidence interval
+confint(fitci)
+
+cat("SVR: \n")
+##run regression
+fittpr <- lm(tpr ~ gender + age + region , data=older)
+summary_tpr <- summary(fittpr)
+summary_tpr
+#95% confidence interval
+confint(fittpr)
+
+cat("SVRI: \n")
+##run regression
+fittpri <- lm(tpri ~ gender + age + region , data=older)
+summary_tpri <- summary(fittpri)
+summary_tpri
+#95% confidence interval
+confint(fittpri)
+
+
+sink()
+
+
+####adjusted Model 2 (adjust for age, region and bmi)
+
+sink(file="table2.older.regression.adjusted.age.region.bmi.csv",append=FALSE)
+
+cat("CO: \n")
+##run regression
+fitco <- lm(co ~ gender + age + region + bmi, data=older)
+summary_co <- summary(fitco)
+summary_co
+#95% confidence interval
+confint(fitco)
+
+cat("CI: \n")
+##run regression
+fitci <- lm(ci ~ gender + age + region + bmi, data=older)
+summary_ci <- summary(fitci)
+summary_ci
+#95% confidence interval
+confint(fitci)
+
+cat("SVR: \n")
+##run regression
+fittpr <- lm(tpr ~ gender + age + region + bmi, data=older)
+summary_tpr <- summary(fittpr)
+summary_tpr
+#95% confidence interval
+confint(fittpr)
+
+cat("SVRI: \n")
+##run regression
+fittpri <- lm(tpri ~ gender + age + region + bmi, data=older)
+summary_tpri <- summary(fittpri)
+summary_tpri
+#95% confidence interval
+confint(fittpri)
+
+
+sink()

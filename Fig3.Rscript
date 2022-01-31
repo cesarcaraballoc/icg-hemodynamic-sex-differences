@@ -1,0 +1,214 @@
+#this script is written to generate Figure 3.
+
+#R package overlapping is required. 
+library(overlapping)
+
+setEPS()
+
+####Setting up a working directory.
+setwd("/working dir")
+
+####loading pre-processed dataset.
+data <- read.csv("demo.processed.data.csv", header=T, na.string="NA")
+
+####Filtering out individuals with elevated blood pressure.
+data <- data[data$sys>=130 | data$dia >= 80,]
+cat("There are ",nrow(data)," included in this study.\n")
+cat("Male: ",nrow(data[data$gender=="male",]),".\n")
+cat("Female: ",nrow(data[data$gender=="female",]),".\n")
+
+
+####separate male and female individuals.
+male <- data[data$gender == "male",]
+female <- data[data$gender == "female",]
+
+
+##calculate overlap area of CO between female and male for all individuals
+co_total <- list(Male=male$co,Female=female$co)
+co_total_overlap <- overlap(co_total,plot=F)
+
+##calculate overlap area of CO between female and male for young individuals
+co_young <- list(Male=male[male$age < 50,]$co,Female=female[female$age < 50,]$co)
+co_young_overlap <- overlap(co_young,plot=F)
+
+##calculate overlap area of CO between female and male for aged individuals
+co_old <- list(Male=male[male$age >= 50,]$co,Female=female[female$age >= 50,]$co)
+co_old_overlap <- overlap(co_old,plot=F)
+
+##calculate overlap area of CI between female and male for all individuals
+ci_total <- list(Male=male$ci,Female=female$ci)
+ci_total_overlap <- overlap(ci_total,plot=F)
+
+##calculate overlap area of CI between female and male for young individuals
+ci_young <- list(Male=male[male$age < 50,]$ci,Female=female[female$age < 50,]$ci)
+ci_young_overlap <- overlap(ci_young,plot=F)
+
+##calculate overlap area of CI between female and male for aged individuals
+ci_old <- list(Male=male[male$age >= 50,]$ci,Female=female[female$age >= 50,]$ci)
+ci_old_overlap <- overlap(ci_old,plot=F)
+
+
+###Creat Figure
+postscript('Fig3.eps', width=8, height=4)
+par(mfrow=c(2,3),mar=c(4,4,2,2))
+
+#Creating a color palette
+cols = palette()
+
+plot(density(male$co), 
+	xlab="",
+	main="A, All",
+	col=cols[1],
+	pch=20,
+	ylim=c(0,0.35), 
+	cex=1.2,
+	lwd=2,
+	xlim=c(0,12))
+lines(density(female$co),
+	col=cols[2],
+	pch=20,
+	lwd=2)
+title(xlab=expression("CO (L/min)"), 
+	line=3, 
+	cex.lab=1)
+legend('topright',
+	c("Men","Women"), 
+	cex=1.2, 
+	fill=cols, 
+	bty="n")
+legend('right', 
+	paste("OA:",round(co_total_overlap$OV,3), sep=""), 
+	cex=1.2, 
+	bty="n")
+
+plot(density(male[male$age < 50,]$co),
+	xlab="", 
+	main="B, < 50 years old",
+	col=cols[1],
+	pch=20,
+	ylim=c(0,0.35),
+	cex=1.2,
+	lwd=2,
+	xlim=c(0,12))
+lines(density(female[female$age < 50,]$co), 
+	col=cols[2],
+	pch=20,
+	lwd=2)
+title(xlab=expression("CO (L/min)"), 
+	line=3, 
+	cex.lab=1)
+legend('topright',
+	c("Men","Women"), 
+	cex=1.2, 
+	fill=cols, 
+	bty="n")
+legend('right', 
+	paste("OA:",round(co_young_overlap$OV,3), sep=""), 
+	cex=1.2, 
+	bty="n")
+
+plot(density(male[male$age >= 50,]$co),
+	xlab="",
+	main="C, >= 50 years old",
+	col=cols[1],
+	pch=20,
+	ylim=c(0,0.35), 
+	cex=1.2,
+	lwd=2,
+	xlim=c(0,12))
+lines(density(female[female$age >= 50,]$co),
+	col=cols[2],
+	pch=20,
+	lwd=2)
+title(xlab=expression("CO (L/min)"), 
+	line=3, 
+	cex.lab=1)
+legend('topright',
+	c("Men","Women"), 
+	cex=1.2, 
+	fill=cols, 
+	bty="n")
+legend('right', 
+	paste("OA:",round(co_old_overlap$OV,3), sep=""), 
+	cex=1.2, 
+	bty="n")
+
+
+plot(density(male$ci),
+	xlab="", 
+	main="D, All",
+	col=cols[1], 
+	pch=20, 
+	ylim=c(0,0.7), 
+	cex=1.2, 
+	lwd=2, 
+	xlim=c(0,7))
+lines(density(female$ci), 
+	col=cols[2], 
+	pch=20, 
+	lwd=2)
+title(xlab=expression("CI (L/min/m"^"2"*")"), 
+	line=3, 
+	cex.lab=1)
+legend('topright', 
+	c("Men","Women"), 
+	cex=1.2, 
+	fill=cols, 
+	bty="n")
+legend('right', 
+	paste("OA:",round(ci_total_overlap$OV,3), sep=""), 
+	cex=1.2, 
+	bty="n")
+
+plot(density(male[male$age < 50,]$ci),
+	xlab="",
+	main="E, < 50 years old",
+	col=cols[1],
+	pch=20,
+	ylim=c(0,0.7), 
+	cex=1.2,
+	lwd=2,
+	xlim=c(0,7))
+lines(density(female[female$age < 50,]$ci),
+	col=cols[2],
+	pch=20,
+	lwd=2)
+title(xlab=expression("CI (L/min/m"^"2"*")"), 
+	line=3, 
+	cex.lab=1)
+legend('topright', 
+	c("Men","Women"), 
+	cex=1.2, 
+	fill=cols, 
+	bty="n")
+legend('right', paste("OA:",round(ci_young_overlap$OV,3), sep=""), 
+	cex=1.2, 
+	bty="n")
+
+plot(density(male[male$age >= 50,]$ci), 
+	xlab="", 
+	main="F, >= 50 years old",
+	col=cols[1],
+	pch=20,
+	ylim=c(0,0.7), 
+	cex=1.2,
+	lwd=2,
+	xlim=c(0,7))
+lines(density(female[female$age >= 50,]$ci),
+	col=cols[2],
+	pch=20,
+	lwd=2)
+title(xlab=expression("CI (L/min/m"^"2"*")"), 
+	line=3, 
+	cex.lab=1)
+legend('topright', 
+	c("Men","Women"), 
+	cex=1.2, 
+	fill=cols, 
+	bty="n")
+legend('right', 
+	paste("OA:",round(ci_old_overlap$OV,3), sep=""), 
+	cex=1.2, 
+	bty="n")
+
+dev.off()

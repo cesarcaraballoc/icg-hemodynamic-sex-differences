@@ -1,0 +1,81 @@
+#this script is written to generate Figure 1.
+
+####Setting up a working directory.
+setwd("/working dir")
+
+####loading pre-processed dataset.
+data <- read.csv("raw.processed.data.csv", header=T, na.string="NA")
+
+
+data$bmi <- data$weight/((data$height/100)^2)
+data$bsa<-(data$height*0.0061)+(data$weight*0.0128)-0.1529
+data$co2tpr <- data$co/data$tpr
+data$tpri <- data$tpr*data$bsa
+data$ci2tpri <- data$ci/data$tpri
+data$pp <- data$sys - data$dia
+data$sv2pp <- data$sv/(data$sys - data$dia)
+data$svi2pp <- data$svi/(data$sys - data$dia)
+
+#######################################
+cat("There are ",nrow(data)," total raw samples.\n")
+cat("Male: ",nrow(data[data$gender=="male",]),".\n")
+cat("Female: ",nrow(data[data$gender=="female",]),".\n")
+#########Data Preprocessing#####
+
+###########Age Filter##############
+cat("Age [20, 80] Exclude: ",nrow(data[data$age < 20 | data$age >80,])," Samples.\n")
+data <- data[data$age>=20,]
+data <- data[data$age<=80,]
+###########
+
+###########Weight Filter#####################
+cat("Weigth [40, 150] Exclude: ",nrow(data[data$weight < 40 | data$weight > 150,])," Samples.\n")
+data <- data[data$weight>=40,]
+data <- data[data$weight<=150,]
+###########
+
+###########Height Filter#####################
+cat("Height [120, 220] Exclude: ",nrow(data[data$height < 120 | data$height > 220,])," Samples.\n")
+data <- data[data$height>=120,]
+data <- data[data$height<=220,]
+###########
+
+###########Sys BP Filter#####################
+cat("SBP [80, 250] Exclude: ",nrow(data[data$sys < 80 | data$sys > 250,])," Samples.\n")
+data <- data[data$sys>=80,]
+data <- data[data$sys<=250,]
+###########
+
+###########Dia BP Filter#####################
+cat("Dia [50, 150] Exclude: ",nrow(data[data$dia < 50 | data$dia > 150,])," Samples.\n")
+data <- data[data$dia>=50,]
+data <- data[data$dia<=150,]
+###########
+
+###########HR Filter#####################
+cat("HR [30, 200] Exclude: ",nrow(data[data$hr < 30 | data$hr > 200,])," Samples.\n")
+data <- data[data$hr>=30,]
+data <- data[data$hr<=200,]
+###########
+
+
+###########SV Filter#####################
+cat("SV [25, 180] Exclude: ",nrow(data[data$sv < 25 | data$sv > 180,])," Samples.\n")
+data <- data[data$sv>=25,]
+data <- data[data$sv<=180,]
+
+###########Z0 Filter#####################
+cat("Z0 [15, 45] Exclude: ",nrow(data[data$z0 < 15 | data$z0 > 45,])," Samples.\n")
+data <- data[data$z0>=15,]
+data <- data[data$z0<=45,]
+###########
+
+
+
+cat("There are ",nrow(data)," included in this study.\n")
+cat("Male: ",nrow(data[data$gender=="male",]),".\n")
+cat("Female: ",nrow(data[data$gender=="female",]),".\n")
+###################################
+
+
+

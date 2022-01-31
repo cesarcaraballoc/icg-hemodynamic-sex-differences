@@ -1,0 +1,141 @@
+#this script is written to generate LMS curvels for Figure S1.
+
+##R package gamlss version 5.2-0 is required 
+library(gamlss)
+
+####Setting up a working directory.
+setwd("/working dir")
+
+####loading pre-processed dataset.
+data <- read.csv("demo.processed.data.csv", header=T, na.string="NA")
+
+####Filtering out individuals with elevated blood pressure.
+data <- data[data$sys>=140 | data$dia >= 90,]
+cat("There are ",nrow(data)," included in this study.\n")
+cat("Male: ",nrow(data[data$gender=="male",]),".\n")
+cat("Female: ",nrow(data[data$gender=="female",]),".\n")
+
+####separate male and female individuals.
+male <- data[data$gender == "male",]
+female <- data[data$gender == "female",]
+
+
+####
+getLMS_Data <- function (obj, xvar = NULL, cent = c(5, 10, 20, 50, 70, 90, 95), legend = TRUE, ylab = "y", xlab = "x", main = NULL, 
+    main.gsub = "@", xleg = min(xvar), yleg = max(obj$y), xlim = range(xvar), 
+    ylim = range(obj$y), save = FALSE, plot = TRUE, points = TRUE, 
+    pch = 15, cex = 0.5, col = gray(0.7), col.centiles = 1:length(cent) + 
+        2, lty.centiles = 1, lwd.centiles = 1, ...) 
+{
+    if (!is.gamlss(obj)) 
+        stop(paste("This is not an gamlss object", "\n", ""))
+    if (is.null(xvar)) 
+        stop(paste("The xvar argument is not specified", "\n", 
+            ""))
+    fname <- obj$family[1]
+    qfun <- paste("q", fname, sep = "")
+    Title <- paste("Centile curves using", fname, sep = " ")
+    main <- if (is.null(main)) 
+        paste("Centile curves using", fname, sep = " ")
+    else gsub(main.gsub, Title, main)
+    oxvar <- xvar[order(xvar)]
+    oyvar <- obj$y[order(xvar)]
+    if (is.matrix(obj$y)) {
+        oyvar <- obj$y[, 1][order(xvar)]
+        ylim <- range(obj$y[, 1])
+        yleg = max(obj$y[, 1])
+    }
+    col <- 3
+    lpar <- length(obj$parameters)
+    ii <- 0
+    per <- rep(0, length(cent))
+    qData <- as.numeric(oxvar)
+    for (var in cent) {
+        if (lpar == 1) {
+            newcall <- call(qfun, var/100, mu = fitted(obj, "mu")[order(xvar)])
+        }
+        else if (lpar == 2) {
+            newcall <- call(qfun, var/100, mu = fitted(obj, "mu")[order(xvar)], 
+                sigma = fitted(obj, "sigma")[order(xvar)])
+        }
+        else if (lpar == 3) {
+            newcall <- call(qfun, var/100, mu = fitted(obj, "mu")[order(xvar)], 
+                sigma = fitted(obj, "sigma")[order(xvar)], nu = fitted(obj, 
+                  "nu")[order(xvar)])
+        }
+        else {
+            newcall <- call(qfun, var/100, mu = fitted(obj, "mu")[order(xvar)], sigma = fitted(obj, "sigma")[order(xvar)], nu = fitted(obj,"nu")[order(xvar)], tau = fitted(obj, "tau")[order(xvar)])
+        }
+        ii <- ii + 1
+        ll <- eval(newcall)
+        if (plot) {
+            #lines(oxvar, ll, col = col.centiles[ii], lty = lty.centiles[ii], 
+            #    lwd = lwd.centiles[ii], ...)
+            qData <- cbind(qData,ll)
+        }
+    }
+    qData <- data.frame(qData)
+    qData <- qData[!duplicated(qData[,1]),]
+    colnames(qData) <- c("Age", "Q5", "Q25", "Q50", "Q75", "Q95")
+    write.table(qData,file=paste(main,".csv",sep=""), sep=",", row.names = FALSE)
+}
+
+
+######################################################################################
+
+
+#####CI Male
+lms(ci, age, data=male, k=2, cent = c(5, 25, 50, 75, 95))
+myfit_ci_male <- lms(ci, age, data=male, k=2)
+#get quantiles data
+getLMS_Data(myfit_ci_male, male$age, points=F, cent=c(5,25,50,75,95), main = "MaleCI.S1")
+
+
+#####CI Female
+lms(ci,age, data=female, k=2, cent = c(5, 25, 50, 75, 95))
+myfit_ci_female <- lms(ci,age, data=female, k=2)
+#get quantiles data
+getLMS_Data(myfit_ci_female, female$age, points=F, cent=c(5, 25, 50, 75, 95), main = "FemaleCI.S1")
+
+
+#####SVRI Male
+lms(tpri,age, data=male, k=2, cent = c(5, 25, 50, 75, 95))
+myfit_tpri_male <- lms(tpri, age, data=male, k=2)
+#get quantiles data
+getLMS_Data(myfit_tpri_male, male$age, points=F, cent=c(5,25,50,75,95), main = "MaleSVRI.S1")
+
+
+#####SVRI Female
+lms(tpri,age, data=female, k=2, cent = c(5, 25, 50, 75, 95))
+myfit_tpri_female <- lms(tpri,age, data=female, k=2)
+#get quantiles data
+getLMS_Data(myfit_tpri_female, female$age, points=F, cent=c(5,25,50,75,95), main = "FemaleSVRI.S1")
+
+
+#####CO Male
+lms(co, age, data=male, k=2, cent = c(5, 25, 50, 75, 95))
+myfit_co_male <- lms(co,age, data=male, k=2)
+#get quantiles data
+getLMS_Data(myfit_co_male, male$age, points=F, cent=c(5, 25, 50, 75, 95), main = "MaleCO.S1")
+
+
+#####CO Female
+lms(co, age, data=female, k=2, cent = c(5, 25, 50, 75, 95))
+myfit_co_female <- lms(co, age, data=female, k=2)
+#get quantiles data
+getLMS_Data(myfit_co_female, female$age, points=F, cent=c(5, 25, 50, 75, 95), main = "FemaleCO.S1")
+
+
+#####TPR Male
+lms(tpr, age, data=male, k=2, cent = c(5, 25, 50, 75, 95))
+myfit_svr_male <- lms(tpr, age, data=male, k=2)
+#get quantiles data
+getLMS_Data(myfit_svr_male, male$age, points=F, cent=c(5, 25, 50, 75, 95), main = "MaleSVR.S1")
+
+
+#####TPR Female
+lms(tpr, age, data=female, k=2, cent = c(5, 25, 50, 75, 95))
+myfit_svr_female <- lms(tpr, age, data=female, k=2)
+#get quantiles data
+getLMS_Data(myfit_svr_female, female$age, points=F, cent=c(5, 25, 50, 75, 95), main = "FemaleSVR.S1")
+
